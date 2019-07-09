@@ -64,16 +64,12 @@
 				var topLeft = view.center - [80, 80];
 				var bottomRight = view.center + [80, 80];
 
-				// Create red rectangle
 				// http://paperjs.org/tutorials/paths/creating-predefined-shapes/
 				// var rectangle = new Rectangle(new Point(50, 50), new Point(150, 100));
+				
+				// Create red rectangle
 				var path = new Path.Rectangle(rectangle);
 				path.fillColor = red;
-				// path.selected = true;
-
-				// stops = last 2 colors from palette, from cp.history
-				var stop1 = cp.history[cp.history.length - 1],
-						stop2 = cp.history[cp.history.length - 2];
 
 				tool.onMouseDown = function(event) {
 					// Set origin of gradient at mouse-down location
@@ -86,7 +82,7 @@
 					// Set rectangle fillColor to gradient
 					path.fillColor = {
 						gradient: {
-							stops: cp.history[cp.history.length-1:],
+							stops: [cp.history[cp.history.length-2], cp.history[cp.history.length-1]]
 							origin: topLeft,
 							destination: bottomRight
 						}
