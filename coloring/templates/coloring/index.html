@@ -46,7 +46,7 @@
 				item: null,
 				lastClicked: null,
 				filePath: '/static/coloring/images/mandala-freepik.svg'
-			};	
+			};
 
 			// color palette
 			var cp = {
@@ -57,15 +57,41 @@
 
 			// your rectangle gradient interaction goes in this function
 			// you may also add code outside of the function (e.g., global variables)
-			function myGradientInteraction(){
+			// http://paperjs.org/tutorials/interaction/mouse-tool-events/
+			function myGradientInteraction() {
 				var tool = new paper.Tool();
 
-				tool.onMouseDown = function (event) {
+				var topLeft = view.center - [80, 80];
+				var bottomRight = view.center + [80, 80];
 
+				// Create red rectangle
+				// http://paperjs.org/tutorials/paths/creating-predefined-shapes/
+				// var rectangle = new Rectangle(new Point(50, 50), new Point(150, 100));
+				var path = new Path.Rectangle(rectangle);
+				path.fillColor = red;
+				// path.selected = true;
+
+				// stops = last 2 colors from palette, from cp.history
+				var stop1 = cp.history[cp.history.length - 1],
+						stop2 = cp.history[cp.history.length - 2];
+
+				tool.onMouseDown = function(event) {
+					// Set origin of gradient at mouse-down location
+					path.add(event.downPoint);
 				}
 
-				tool.onMouseUp = function (event) {
-					
+				tool.onMouseUp = function(event) {
+					// Set destination of gradient at mouse-up location
+					path.add(event.point);
+					// Set rectangle fillColor to gradient
+					path.fillColor = {
+						gradient: {
+							stops: cp.history[cp.history.length-1:],
+							origin: topLeft,
+							destination: bottomRight
+						}
+					}
+
 				}
 			}
 
@@ -114,22 +140,22 @@
 				paper.setup(canvas);
 				getColorsCreatePalette();
 
-				paper.project.importSVG(mandala.filePath, function(item) { 
+				paper.project.importSVG(mandala.filePath, function(item) {
 					mandala.item = item._children["design-freepik"];
 				    paper.project.insertLayer(0,mandala.item);
 
 				    if (custom) {
-				    	myCustomInteraction();	
+				    	myCustomInteraction();
 				    } else {
 				    	myGradientInteraction();
-				    }		
-					
-				}); 
+				    }
+
+				});
 			}
 
-			// To see your myGradientInteraction version visit: 
+			// To see your myGradientInteraction version visit:
 			// http://<your url>:8000/coloring/?type=gradient
-			// To see your myCustomInteraction version visit: 
+			// To see your myCustomInteraction version visit:
 			// http://<your url>:8000/coloring/
 			var url = window.location.href;
 			if (url.indexOf("gradient") > -1) {
@@ -140,7 +166,7 @@
 		}
 	</script>
 </head>
-<body>	
+<body>
 
 	<canvas id="myCanvas" width="750px" height="750px"></canvas>
 	<div id="color-palette"></div>
