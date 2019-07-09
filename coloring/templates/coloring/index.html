@@ -79,13 +79,13 @@
 					// Set destination of gradient at mouse-up location
 					// path.add(event.point);
 					destination = event.point;
-					
+
 					// Set rectangle fillColor to gradient
 					path.fillColor = {
 						gradient: {
 							stops: [cp.history[cp.history.length-2], cp.history[cp.history.length-1]],
-							origin: origin;
-							destination: destination;
+							origin: origin,
+							destination: destination
 						}
 					}
 
