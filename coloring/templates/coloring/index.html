@@ -68,6 +68,7 @@
 				var rectangle = new paper.Rectangle(new Point(50, 50), new Point(150, 100));
 				var path = new paper.Path.Rectangle(rectangle)
 				path.fillColor = 'red';
+				path.closed = true;
 				paper.view.draw();
 
 				tool.onMouseDown = function(event) {
