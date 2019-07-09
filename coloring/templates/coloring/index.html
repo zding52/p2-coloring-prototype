@@ -61,7 +61,7 @@
 			function myGradientInteraction() {
 				var tool = new paper.Tool();
 
-				var origin, destination;
+				var start, end;
 
 				// Create red rectangle
 				// http://paperjs.org/tutorials/paths/creating-predefined-shapes/
@@ -75,21 +75,21 @@
 				tool.onMouseDown = function(event) {
 					// Set origin of gradient at mouse-down location
 					// path.add(event.downPoint);
-					origin = event.point;
+					start = event.point;
 				}
 
 				tool.onMouseUp = function(event) {
 					// Set destination of gradient at mouse-up location
 					// path.add(event.point);
-					destination = event.point;
+					end = event.point;
 
 					// Set rectangle fillColor to gradient
 					path.fillColor = {
 						gradient: {
 							stops: [cp.history[cp.history.length-2], cp.history[cp.history.length-1]]
 						},
-						origin: origin,
-						destination: destination
+						origin: start,
+						destination: end
 					}
 
 				}
