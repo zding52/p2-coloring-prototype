@@ -61,13 +61,13 @@
 			function myGradientInteraction() {
 				var tool = new paper.Tool();
 
-				var start, end;
+				var start;
+				var end;
 
 				// Create red rectangle
 				// http://paperjs.org/tutorials/paths/creating-predefined-shapes/
-				// var rectangle = new paper.Rectangle(new paper.Point(150, 250), new paper.Point(485, 450));
-				// var path = new paper.Path.Rectangle(rectangle);
-				var path = new paper.Path.Rectangle(new paper.Point(150, 250), new paper.Point(485, 450));
+				var rectangle = new paper.Rectangle(new paper.Point(150, 250), new paper.Point(485, 450));
+				var path = new paper.Path.Rectangle(rectangle);
 				path.fillColor = 'red';
 				path.closed = true;
 				paper.view.draw();
@@ -91,7 +91,7 @@
 						origin: start,
 						destination: end
 					};
-					
+
 				}
 
 			}
