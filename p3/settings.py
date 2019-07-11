@@ -25,7 +25,7 @@ SECRET_KEY = 'dt)!z4cwnj8#4e&rr94$k1s6^^(t*%@$2$)jt*hs&7^at-%72$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['p2-paperjs-jwu7082-jwu7082387298.codeanyapp.com', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['p2-paperjs-jwu7082-jwu7082387298.codeanyapp.com', '127.0.0.1', '0.0.0.0', 'p2-coloring-prototype-jwu7082387298.codeanyapp.com']
 
 
 # Application definition
