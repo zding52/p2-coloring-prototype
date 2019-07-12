@@ -14,12 +14,18 @@
   <script type="text/javascript" src="{% static 'coloring/vendors/hammer/hammer.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'coloring/vendors/hammer/jquery.hammer.js' %}"></script>
   
+  <link rel="stylesheet" type="text/css" href="{% static 'coloring/vendors/normalize.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'coloring/vendors/bootstrap/css/bootstrap.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'coloring/css/style.css' %}" />
   
   
   <!-- TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body -->
 	<style type="text/css">
+
+    .body { 
+      margin: 0;
+      padding: 0;
+    }
 
 		#color-palette {
 			width: 300px;
@@ -38,25 +44,28 @@
 			border-radius: 12px;
 			margin: 3px;
 		}
-
-		#myCanvas {
-			padding-left: 0;
-		    padding-right: 0;
-/* 		    margin-left: auto;
-		    margin-right: auto; */
-      margin: 0;
-		    display: block;
+    
+ 		#myCanvas {
+     position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: block;
+/*       overflow: hidden; */ 
+      background-color: blueviolet; /* for testing purposes */
+/*       width: 100%; */
 		}
 	</style>
   
   
   
 	<script type="text/javascript" canvas="canvas">
-		  window.onload = function() {
+      window.onload = function() {
 			var canvas = document.getElementById('myCanvas');
-      
-      // ZOOM FUNCTIONALITY USING HAMMER.JS
-      // TODO: PREVENT COLORING WHEN ZOOMING
+       
+      // ZOOM FUNCTIONALITY USING HAMMER.JS 
+        // TODO: PREVENT COLORING WHEN ZOOMING! 
+        // TODO: CHANGE ZOOM TO PTR LOCATION NOT CENTER?
       var pinchHammer = new Hammer(document.getElementById('myCanvas'));
       pinchHammer.get('pinch').set({ enable: true }); // disabled by default
       pinchHammer.on('pinch', function(e) {
@@ -67,18 +76,14 @@
       });
         
       // PAN FUNCTIONALITY USING HAMMER.JS
-      var panHammer = new Hammer(document.getElementById('myCanvas'));
-      panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
-      panHammer.on('pan', function(e) {
-        if (e.scale > 1) {
-          $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
-//           var toolPan = new paper.Tool();
-//           toolPan.onMouseDrag = function (event) {
-//             var offset = event.downPoint - event.point;
-//             paper.view.center = paper.view.center + offset;
-//           }
-        }
-      });
+      // Requires 2 fingers. Combined with zoom. 
+//       var panHammer = new Hammer(document.getElementById('myCanvas'));
+//       panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
+//       panHammer.on('pan', function(e) {
+//         if (e.scale > 1) {
+//          $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
+//         }
+//       });
 
 
 			// coloring page
@@ -112,13 +117,11 @@
 
 				tool.onMouseDown = function(event) {
 					// Set origin of gradient at mouse-down location
-					// path.add(event.downPoint);
 					start = event.point;
 				}
 
 				tool.onMouseUp = function(event) {
 					// Set destination of gradient at mouse-up location
-					// path.add(event.point);
 					end = event.point;
 
 					// Set rectangle fillColor to gradient
@@ -139,7 +142,7 @@
         tool.fixedDistance = 30;
         
         /* SOLID COLOR FILL */
-				tool.onMouseDown = function (event) {
+				tool.onMouseDown = function(event) {
 				    var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
 				    if (hit) {
 				        hit.item.fillColor = cp.history[cp.history.length - 1];
@@ -147,7 +150,7 @@
 				}
         
         
-        /* THIS HAS BEEN DELETED BECAUSE THERE IS NO WAY TO DISTINGUISH BETWEEN PANNING AND MARKER-COLORING UNLESS PAN TAKES 2 FINGERS */
+        /* MODIFY THIS SO THAT MARKER/PEN IS ONLY USED TO ADD TO/CREATE OWN OUTLINES */
 //         /* MARKER */
 //         // http://paperjs.org/tutorials/interaction/working-with-mouse-vectors/#adding-brush-stroke-ends
 //         tool.onMouseDown = function(event) {
@@ -242,7 +245,7 @@
   
   
 <body>
-	<canvas id="myCanvas" width="750px" height="750px"></canvas>
+  <canvas id="myCanvas" width="770px" height="770px"></canvas>
 	<div id="color-palette"></div>
 </body>
 </html>
