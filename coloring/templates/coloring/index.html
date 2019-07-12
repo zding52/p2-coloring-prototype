@@ -57,8 +57,10 @@
       var pinchHammer = new Hammer(document.getElementById('myCanvas'));
       pinchHammer.get('pinch').set({ enable: true }); // disabled by default
       pinchHammer.on('pinch', function(e) {
-            $('.outline').css('transform', 'scale(' + e.scale + ')');
-        });
+        if (e.scale > 1) {
+            $('#myCanvas').css('transform', 'scale(' + e.scale + ')');
+        }
+      });
 
 			// coloring page
 			var mandala = {
