@@ -4,11 +4,21 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  	<title>P3 Coloring</title>
-
+  <title>P3 Coloring</title>
+  
 	<script type="text/javascript" src="{% static 'coloring/vendors/jquery/jquery-3.3.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'coloring/vendors/jquery-ui/jquery-ui.min.js' %}"></script>
+  
 	<script type="text/javascript" src="{% static 'coloring/vendors/paper/paper-full.min.js' %}"></script>
-
+  
+  <script type="text/javascript" src="{% static 'coloring/vendors/hammer/hammer.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'coloring/vendors/hammer/jquery.hammer.js' %}"></script>
+  
+  <link rel="stylesheet" type="text/css" href="{% static 'coloring/vendors/bootstrap/css/bootstrap.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'coloring/css/style.css' %}" />
+  
+  
+  <!-- TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body -->
 	<style type="text/css">
 		#color-palette {
 			width: 300px;
@@ -36,10 +46,19 @@
 		    display: block;
 		}
 	</style>
-
+  
+  
+  
 	<script type="text/javascript" canvas="canvas">
 		window.onload = function() {
 			var canvas = document.getElementById('myCanvas');
+      
+      // ZOOM FUNCTIONALITY USING HAMMER.JS
+      var pinchHammer = new Hammer(document.getElementById('myCanvas'));
+      pinchHammer.get('pinch').set({ enable: true }); // disabled by default
+      pinchHammer.on('pinch', function(e) {
+            $('.outline').css('transform', 'scale(' + e.scale + ')');
+        });
 
 			// coloring page
 			var mandala = {
@@ -47,6 +66,9 @@
 				lastClicked: null,
 				filePath: '/static/coloring/images/mandala-freepik.svg'
 			};
+      
+      // ADD ".outline" CLASS TO MANDALA
+      
 
 			// color palette
 			var cp = {
@@ -60,10 +82,8 @@
 			// http://paperjs.org/tutorials/interaction/mouse-tool-events/
 			function myGradientInteraction() {
 				var tool = new paper.Tool();
-
 				var start;
 				var end;
-
 				// Create red rectangle
 				// http://paperjs.org/tutorials/paths/creating-predefined-shapes/
 				var rectangle = new paper.Rectangle(new paper.Point(150, 250), new paper.Point(485, 450));
@@ -91,16 +111,14 @@
 						origin: start,
 						destination: end
 					};
-
 				}
-
 			}
 
 			// your custom interaction goes here!
-			// you may replace everything
 			function myCustomInteraction() {
 				var tool = new paper.Tool();
-        
+        var path;
+        tool.fixedDistance = 30;
         
         /* SOLID COLOR FILL */
 // 				tool.onMouseDown = function (event) {
@@ -112,46 +130,52 @@
         
         /* MARKER */
         // http://paperjs.org/tutorials/interaction/working-with-mouse-vectors/#adding-brush-stroke-ends
-        tool.fixedDistance = 30;
-        var path;
-
-        function onMouseDown(event) {
-          path = new Path();
-          path.fillColor = {
-            hue: Math.random() * 360,
-            saturation: 1,
-            brightness: 1
-          };
+        tool.onMouseDown = function(event) {
+          var hitOptions = { fill: true, tolerance: 1 };
+          var hitResult = mandala.item.hitTest(event.point, hitOptions);
+          
+          // TODO: FIX 
+          if (hitResult) {
+            path = hitResult.item;
+          } else {
+            path = new paper.Path();
+          }
+          
+          // TODO: add a new path inside hitResult.item.
+//           if (hitResult) {
+//             path = new paper.Path();
+//             hitResult.addChild
+//             path.add(hitResult.item.hitTest.point); 
+//           }
+       
+          // path.fillColor = { hue: Math.random() * 360, saturation: 1, brightness: 1 };
+          path.fillColor = cp.history[cp.history.length - 1];
         }
 
-        function onMouseDrag(event) {
+        tool.onMouseDrag = function(event) {
           var step = event.delta / 2;
           step.angle += 90;
           var top = event.middlePoint + step;
           var bottom = event.middlePoint - step;
           path.add(top);
           path.insert(0, bottom);
-          path.smooth();
         }
 
-        function onMouseUp(event) {
+        tool.onMouseUp = function(event) {
           path.closed = true;
-          path.smooth();
         }
         
         /* WATERCOLOR */
         // TODO
     }
 
-
+/* ======= TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body ======= */
 			// create a color palette with the given colors
-			function createColorPalette(colors){
-
+			function createColorPalette(colors) {
 				// create a swatch for each color
 				for (var i = colors.length - 1; i >= 0; i--) {
-					var $swatch = $("<div>").css("background-color", colors[i])
-									   .addClass("swatch");
-					$swatch.click(function(){
+					var $swatch = $("<div>").css("background-color", colors[i]).addClass("swatch");
+					$swatch.click(function() {
 						// add color to the color palette history
 					  	cp.history.push($(this).css("background-color"));
 					});
@@ -160,9 +184,9 @@
 			}
 
 			// loads a set of colors from a json to create a color palette
-			function getColorsCreatePalette(){
+			function getColorsCreatePalette() {
 				cp.$container.html(" ");
-				$.getJSON('/static/coloring/vendors/material/material-colors.json', function(colors){
+				$.getJSON('/static/coloring/vendors/material/material-colors.json', function(colors) {
 					var keys = Object.keys(colors);
 					for (var i = keys.length - 1; i >= 0; i--) {
 						cp.options.push(colors[keys[i]][500]);
@@ -171,27 +195,21 @@
 				});
 			}
 
-			function init(custom){
+			function init(custom) {
 				paper.setup(canvas);
 				getColorsCreatePalette();
-
 				paper.project.importSVG(mandala.filePath, function(item) {
 					mandala.item = item._children["design-freepik"];
-				    paper.project.insertLayer(0,mandala.item);
-
+				    paper.project.insertLayer(0, mandala.item);
 				    if (custom) {
 				    	myCustomInteraction();
 				    } else {
 				    	myGradientInteraction();
 				    }
-
 				});
 			}
-
-			// To see your myGradientInteraction version visit:
-			// http://<your url>:8000/coloring/?type=gradient
-			// To see your myCustomInteraction version visit:
-			// http://<your url>:8000/coloring/
+			// To see your myGradientInteraction version visit http://<your url>:8000/coloring/?type=gradient
+			// To see your myCustomInteraction version visit http://<your url>:8000/coloring/
 			var url = window.location.href;
 			if (url.indexOf("gradient") > -1) {
 				init(false);
@@ -201,8 +219,9 @@
 		}
 	</script>
 </head>
+  
+  
 <body>
-
 	<canvas id="myCanvas" width="750px" height="750px"></canvas>
 	<div id="color-palette"></div>
 </body>
