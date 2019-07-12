@@ -20,6 +20,7 @@
   
   <!-- TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body -->
 	<style type="text/css">
+
 		#color-palette {
 			width: 300px;
 			background-color: #f1f1f1;
@@ -41,8 +42,9 @@
 		#myCanvas {
 			padding-left: 0;
 		    padding-right: 0;
-		    margin-left: auto;
-		    margin-right: auto;
+/* 		    margin-left: auto;
+		    margin-right: auto; */
+      margin: 0;
 		    display: block;
 		}
 	</style>
@@ -50,17 +52,34 @@
   
   
 	<script type="text/javascript" canvas="canvas">
-		window.onload = function() {
+		  window.onload = function() {
 			var canvas = document.getElementById('myCanvas');
       
       // ZOOM FUNCTIONALITY USING HAMMER.JS
+      // TODO: PREVENT COLORING WHEN ZOOMING
       var pinchHammer = new Hammer(document.getElementById('myCanvas'));
       pinchHammer.get('pinch').set({ enable: true }); // disabled by default
       pinchHammer.on('pinch', function(e) {
+        if (e.scale >= 1) {
+         // $('#myCanvas').css('transform', 'scale(' + e.scale + ')');
+            paper.view.zoom = e.scale;
+         }
+      });
+        
+      // PAN FUNCTIONALITY USING HAMMER.JS
+      var panHammer = new Hammer(document.getElementById('myCanvas'));
+      panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
+      panHammer.on('pan', function(e) {
         if (e.scale > 1) {
-            $('#myCanvas').css('transform', 'scale(' + e.scale + ')');
+          $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
+//           var toolPan = new paper.Tool();
+//           toolPan.onMouseDrag = function (event) {
+//             var offset = event.downPoint - event.point;
+//             paper.view.center = paper.view.center + offset;
+//           }
         }
       });
+
 
 			// coloring page
 			var mandala = {
@@ -68,10 +87,7 @@
 				lastClicked: null,
 				filePath: '/static/coloring/images/mandala-freepik.svg'
 			};
-      
-      // ADD ".outline" CLASS TO MANDALA
-      
-
+     
 			// color palette
 			var cp = {
 				history: ["#000000"], // black selected by default
@@ -123,49 +139,51 @@
         tool.fixedDistance = 30;
         
         /* SOLID COLOR FILL */
-// 				tool.onMouseDown = function (event) {
-// 				    var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
-// 				    if (hit) {
-// 				        hit.item.fillColor = cp.history[cp.history.length - 1];
-// 				    }
-// 				}
+				tool.onMouseDown = function (event) {
+				    var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
+				    if (hit) {
+				        hit.item.fillColor = cp.history[cp.history.length - 1];
+				    }
+				}
         
-        /* MARKER */
-        // http://paperjs.org/tutorials/interaction/working-with-mouse-vectors/#adding-brush-stroke-ends
-        tool.onMouseDown = function(event) {
-          var hitOptions = { fill: true, tolerance: 1 };
-          var hitResult = mandala.item.hitTest(event.point, hitOptions);
+        
+        /* THIS HAS BEEN DELETED BECAUSE THERE IS NO WAY TO DISTINGUISH BETWEEN PANNING AND MARKER-COLORING UNLESS PAN TAKES 2 FINGERS */
+//         /* MARKER */
+//         // http://paperjs.org/tutorials/interaction/working-with-mouse-vectors/#adding-brush-stroke-ends
+//         tool.onMouseDown = function(event) {
+//           var hitOptions = { fill: true, tolerance: 1 };
+//           var hitResult = mandala.item.hitTest(event.point, hitOptions);
           
-          // TODO: FIX 
-          if (hitResult) {
-            path = hitResult.item;
-          } else {
-            path = new paper.Path();
-          }
-          
-          // TODO: add a new path inside hitResult.item.
+//           // TODO: FIX/DELETE 
 //           if (hitResult) {
+//             path = hitResult.item;
+//           } else {
 //             path = new paper.Path();
-//             hitResult.addChild
-//             path.add(hitResult.item.hitTest.point); 
 //           }
+          
+//           // TODO: add a new path inside hitResult.item.
+// //           if (hitResult) {
+// //             path = new paper.Path();
+// //             hitResult.addChild
+// //             path.add(hitResult.item.hitTest.point); 
+// //           }
        
-          // path.fillColor = { hue: Math.random() * 360, saturation: 1, brightness: 1 };
-          path.fillColor = cp.history[cp.history.length - 1];
-        }
+//           // path.fillColor = { hue: Math.random() * 360, saturation: 1, brightness: 1 };
+//           path.fillColor = cp.history[cp.history.length - 1];
+//         }
 
-        tool.onMouseDrag = function(event) {
-          var step = event.delta / 2;
-          step.angle += 90;
-          var top = event.middlePoint + step;
-          var bottom = event.middlePoint - step;
-          path.add(top);
-          path.insert(0, bottom);
-        }
+//         tool.onMouseDrag = function(event) {
+//           var step = event.delta / 2;
+//           step.angle += 90;
+//           var top = event.middlePoint + step;
+//           var bottom = event.middlePoint - step;
+//           path.add(top);
+//           path.insert(0, bottom);
+//         }
 
-        tool.onMouseUp = function(event) {
-          path.closed = true;
-        }
+//         tool.onMouseUp = function(event) {
+//           path.closed = true;
+//         }
         
         /* WATERCOLOR */
         // TODO
