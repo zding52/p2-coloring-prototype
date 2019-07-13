@@ -1,37 +1,46 @@
-{% load static %}
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>P3 Coloring</title>
-  
-	<script type="text/javascript" src="{% static 'coloring/vendors/jquery/jquery-3.3.1.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'coloring/vendors/jquery-ui/jquery-ui.min.js' %}"></script>
-  
-	<script type="text/javascript" src="{% static 'coloring/vendors/paper/paper-full.min.js' %}"></script>
-  
-  <script type="text/javascript" src="{% static 'coloring/vendors/hammer/hammer.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'coloring/vendors/hammer/jquery.hammer.js' %}"></script>
-  
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script> <!-- FOR WATERCOLOR -->
-  
-  <link rel="stylesheet" type="text/css" href="{% static 'coloring/vendors/normalize.css' %}" />
-  <link rel="stylesheet" type="text/css" href="{% static 'coloring/vendors/bootstrap/css/bootstrap.css' %}" />
-	<link rel="stylesheet" type="text/css" href="{% static 'coloring/css/style.css' %}" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>P3 Coloring</title>
+    <!-- FOR LOCALHOST -->  
+<!--
+    <script type="text/javascript" src="../../static/coloring/vendors/jquery/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="../../static/coloring/vendors/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../../static/coloring/vendors/paper/paper-full.min.js"></script>
+    <script type="text/javascript" src="../../static/coloring/vendors/hammer/hammer.min.js"></script>
+    <script type="text/javascript" src="../../static/coloring/vendors/hammer/jquery.hammer.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/coloring/vendors/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/coloring/vendors/bootstrap/css/bootstrap.css" />
+-->
+    
+    <!-- FOR CODEANYWHERE -->
+    <script type="text/javascript" src="coloring/vendors/jquery/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="coloring/vendors/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="coloring/vendors/paper/paper-full.min.js"></script>
+    <script type="text/javascript" src="coloring/vendors/hammer/hammer.min.js"></script>
+    <script type="text/javascript" src="coloring/vendors/hammer/jquery.hammer.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script> <!-- FOR WATERCOLOR -->
+    <link rel="stylesheet" type="text/css" href="coloring/vendors/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="coloring/vendors/bootstrap/css/bootstrap.css" />
+    
+    <style type="text/css">
+        body, 
+        html {
+            height: 100%;
+        }
 
-  <!-- TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body -->
-	<style type="text/css">
-
-    .body { 
-      margin: 0;
-      padding: 0;
-     background-image: url(https://sirxemic.github.io/jquery.ripples/img/bg2.jpg);
-     background-size: cover;
-    }
-
-		#color-palette {
-      z-index: 2;
+        body {
+            height: 100%;
+            background-image: url(https://sirxemic.github.io/jquery.ripples/img/bg2.jpg);
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #color-palette {
+            z-index: 2;
 			width: 300px;
 			background-color: #f1f1f1;
 			display: flex;
@@ -50,54 +59,108 @@
 		}
     
  		#myCanvas {
-      z-index: 2;
-     position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: block;
-/*       overflow: hidden; */ 
-      background-color: blueviolet; /* for testing purposes */
-      background-color: transparent;
-/*       width: 100%; */
+            z-index: 99999;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: block;
+            background-color: transparent;
 		}
-    
-    #watercolor-canvas {
-      opacity: .8;
-      background-image: url(https://sirxemic.github.io/jquery.ripples/img/bg2.jpg);
-     background-size: cover;
-    }
-	</style>
- 
-  
-	<script type="text/javascript" canvas="canvas">
-      window.onload = function() {
-			var canvas = document.getElementById('myCanvas');
-       
-      // ZOOM FUNCTIONALITY USING HAMMER.JS 
-        // TODO: PREVENT COLORING WHEN ZOOMING! 
-        // TODO: CHANGE ZOOM TO PTR LOCATION NOT CENTER?
-      var pinchHammer = new Hammer(document.getElementById('myCanvas'));
-      pinchHammer.get('pinch').set({ enable: true }); // disabled by default
-      pinchHammer.on('pinch', function(e) {
-        if (e.scale >= 1) {
-         // $('#myCanvas').css('transform', 'scale(' + e.scale + ')');
-            paper.view.zoom = e.scale;
-         }
-      });
+
+        #meter, 
+        #watercolor-canvas {
+/*            height: 70vh;*/
+            position: absolute;
+            height: 100%;
+            
+            background-color: rgba(skyblue, .6);
+/*            z-index: 5000;*/
+            opacity: .6;
+        }
         
-      /* PAN FUNCTIONALITY USING HAMMER.JS
-      // Requires 2 fingers. Combined with zoom. 
-//       var panHammer = new Hammer(document.getElementById('myCanvas'));
-//       panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
-//       panHammer.on('pan', function(e) {
-//         if (e.scale > 1) {
-//          $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
-//         }
-//       }); */
+        .fish {
+            z-index: 20;
+        }
+    </style>
+    
+    <script type="text/javascript" canvas="canvas">
+         /**
+         * jQuery Ripples plugin v0.6.2 / https://github.com/sirxemic/jquery.ripples
+         * MIT License
+         * @author sirxemic / https://sirxemic.com/
+         */
+        !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("jquery")):"function"==typeof define&&define.amd?define(["jquery"],t):t(e.$)}(this,function(e){"use strict";function t(e){return"%"==e[e.length-1]}function r(e){var t=e.split(" ");if(1!==t.length)return t.map(function(t){switch(e){case"center":return"50%";case"top":case"left":return"0";case"right":case"bottom":return"100%";default:return t}});switch(e){case"center":return["50%","50%"];case"top":return["50%","0"];case"bottom":return["50%","100%"];case"left":return["0","50%"];case"right":return["100%","50%"];default:return[e,"50%"]}}function i(e,t,r){function i(e,t){var r=s.createShader(e);if(s.shaderSource(r,t),s.compileShader(r),!s.getShaderParameter(r,s.COMPILE_STATUS))throw new Error("compile error: "+s.getShaderInfoLog(r));return r}var o={};if(o.id=s.createProgram(),s.attachShader(o.id,i(s.VERTEX_SHADER,e)),s.attachShader(o.id,i(s.FRAGMENT_SHADER,t)),s.linkProgram(o.id),!s.getProgramParameter(o.id,s.LINK_STATUS))throw new Error("link error: "+s.getProgramInfoLog(o.id));o.uniforms={},o.locations={},s.useProgram(o.id),s.enableVertexAttribArray(0);for(var n,a,u=/uniform (\w+) (\w+)/g,h=e+t;null!=(n=u.exec(h));)a=n[2],o.locations[a]=s.getUniformLocation(o.id,a);return o}function o(e,t){s.activeTexture(s.TEXTURE0+(t||0)),s.bindTexture(s.TEXTURE_2D,e)}function n(e){var t=/url\(["']?([^"']*)["']?\)/.exec(e);return null==t?null:t[1]}function a(e){return e.match(/^data:/)}var s,u=(e=e&&"default"in e?e.default:e)(window),h=function(){function e(e,t,i){var o="OES_texture_"+e,n=o+"_linear",a=n in r,s=[o];return a&&s.push(n),{type:t,arrayType:i,linearSupport:a,extensions:s}}var t=document.createElement("canvas");if(!(s=t.getContext("webgl")||t.getContext("experimental-webgl")))return null;var r={};if(["OES_texture_float","OES_texture_half_float","OES_texture_float_linear","OES_texture_half_float_linear"].forEach(function(e){var t=s.getExtension(e);t&&(r[e]=t)}),!r.OES_texture_float)return null;var i=[];i.push(e("float",s.FLOAT,Float32Array)),r.OES_texture_half_float&&i.push(e("half_float",r.OES_texture_half_float.HALF_FLOAT_OES,null));var o=s.createTexture(),n=s.createFramebuffer();s.bindFramebuffer(s.FRAMEBUFFER,n),s.bindTexture(s.TEXTURE_2D,o),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE);for(var a=null,u=0;u<i.length;u++)if(s.texImage2D(s.TEXTURE_2D,0,s.RGBA,32,32,0,s.RGBA,i[u].type,null),s.framebufferTexture2D(s.FRAMEBUFFER,s.COLOR_ATTACHMENT0,s.TEXTURE_2D,o,0),s.checkFramebufferStatus(s.FRAMEBUFFER)===s.FRAMEBUFFER_COMPLETE){a=i[u];break}return a}(),c=function(e,t){try{return new ImageData(e,t)}catch(r){return document.createElement("canvas").getContext("2d").createImageData(e,t)}}(32,32);e("head").prepend("<style>.jquery-ripples { position: relative; z-index: 0; }</style>");var d=function(t,r){function i(){o.destroyed||(o.step(),requestAnimationFrame(i))}var o=this;this.$el=e(t),this.interactive=r.interactive,this.resolution=r.resolution,this.textureDelta=new Float32Array([1/this.resolution,1/this.resolution]),this.perturbance=r.perturbance,this.dropRadius=r.dropRadius,this.crossOrigin=r.crossOrigin,this.imageUrl=r.imageUrl;var n=document.createElement("canvas");n.width=this.$el.innerWidth(),n.height=this.$el.innerHeight(),this.canvas=n,this.$canvas=e(n),this.$canvas.css({position:"absolute",left:0,top:0,right:0,bottom:0,zIndex:-1}),this.$el.addClass("jquery-ripples").append(n),this.context=s=n.getContext("webgl")||n.getContext("experimental-webgl"),h.extensions.forEach(function(e){s.getExtension(e)}),e(window).on("resize",function(){o.updateSize()}),this.textures=[],this.framebuffers=[],this.bufferWriteIndex=0,this.bufferReadIndex=1;for(var a=h.arrayType,u=a?new a(this.resolution*this.resolution*4):null,c=0;c<2;c++){var d=s.createTexture(),f=s.createFramebuffer();s.bindFramebuffer(s.FRAMEBUFFER,f),s.bindTexture(s.TEXTURE_2D,d),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,h.linearSupport?s.LINEAR:s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,h.linearSupport?s.LINEAR:s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,this.resolution,this.resolution,0,s.RGBA,h.type,u),s.framebufferTexture2D(s.FRAMEBUFFER,s.COLOR_ATTACHMENT0,s.TEXTURE_2D,d,0),this.textures.push(d),this.framebuffers.push(f)}this.quad=s.createBuffer(),s.bindBuffer(s.ARRAY_BUFFER,this.quad),s.bufferData(s.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,1,1,-1,1]),s.STATIC_DRAW),this.initShaders(),this.initTexture(),this.setTransparentTexture(),this.loadImage(),s.clearColor(0,0,0,0),s.blendFunc(s.SRC_ALPHA,s.ONE_MINUS_SRC_ALPHA),this.visible=!0,this.running=!0,this.inited=!0,this.destroyed=!1,this.setupPointerEvents(),requestAnimationFrame(i)};d.DEFAULTS={imageUrl:null,resolution:256,dropRadius:20,perturbance:.03,interactive:!0,crossOrigin:""},d.prototype={setupPointerEvents:function(){function e(){return r.visible&&r.running&&r.interactive}function t(t,i){e()&&r.dropAtPointer(t,r.dropRadius*(i?1.5:1),i?.14:.01)}var r=this;this.$el.on("mousemove.ripples",function(e){t(e)}).on("touchmove.ripples, touchstart.ripples",function(e){for(var r=e.originalEvent.changedTouches,i=0;i<r.length;i++)t(r[i])}).on("mousedown.ripples",function(e){t(e,!0)})},loadImage:function(){var e=this;s=this.context;var t=this.imageUrl||n(this.originalCssBackgroundImage)||n(this.$el.css("backgroundImage"));if(t!=this.imageSource)if(this.imageSource=t,this.imageSource){var r=new Image;r.onload=function(){function t(e){return 0==(e&e-1)}s=e.context;var i=t(r.width)&&t(r.height)?s.REPEAT:s.CLAMP_TO_EDGE;s.bindTexture(s.TEXTURE_2D,e.backgroundTexture),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,i),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,i),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,r),e.backgroundWidth=r.width,e.backgroundHeight=r.height,e.hideCssBackground()},r.onerror=function(){s=e.context,e.setTransparentTexture()},r.crossOrigin=a(this.imageSource)?null:this.crossOrigin,r.src=this.imageSource}else this.setTransparentTexture()},step:function(){s=this.context,this.visible&&(this.computeTextureBoundaries(),this.running&&this.update(),this.render())},drawQuad:function(){s.bindBuffer(s.ARRAY_BUFFER,this.quad),s.vertexAttribPointer(0,2,s.FLOAT,!1,0,0),s.drawArrays(s.TRIANGLE_FAN,0,4)},render:function(){s.bindFramebuffer(s.FRAMEBUFFER,null),s.viewport(0,0,this.canvas.width,this.canvas.height),s.enable(s.BLEND),s.clear(s.COLOR_BUFFER_BIT|s.DEPTH_BUFFER_BIT),s.useProgram(this.renderProgram.id),o(this.backgroundTexture,0),o(this.textures[0],1),s.uniform1f(this.renderProgram.locations.perturbance,this.perturbance),s.uniform2fv(this.renderProgram.locations.topLeft,this.renderProgram.uniforms.topLeft),s.uniform2fv(this.renderProgram.locations.bottomRight,this.renderProgram.uniforms.bottomRight),s.uniform2fv(this.renderProgram.locations.containerRatio,this.renderProgram.uniforms.containerRatio),s.uniform1i(this.renderProgram.locations.samplerBackground,0),s.uniform1i(this.renderProgram.locations.samplerRipples,1),this.drawQuad(),s.disable(s.BLEND)},update:function(){s.viewport(0,0,this.resolution,this.resolution),s.bindFramebuffer(s.FRAMEBUFFER,this.framebuffers[this.bufferWriteIndex]),o(this.textures[this.bufferReadIndex]),s.useProgram(this.updateProgram.id),this.drawQuad(),this.swapBufferIndices()},swapBufferIndices:function(){this.bufferWriteIndex=1-this.bufferWriteIndex,this.bufferReadIndex=1-this.bufferReadIndex},computeTextureBoundaries:function(){var e,i=this.$el.css("background-size"),o=this.$el.css("background-attachment"),n=r(this.$el.css("background-position"));if("fixed"==o?((e={left:window.pageXOffset,top:window.pageYOffset}).width=u.width(),e.height=u.height()):((e=this.$el.offset()).width=this.$el.innerWidth(),e.height=this.$el.innerHeight()),"cover"==i)var a=Math.max(e.width/this.backgroundWidth,e.height/this.backgroundHeight),s=this.backgroundWidth*a,h=this.backgroundHeight*a;else if("contain"==i)var a=Math.min(e.width/this.backgroundWidth,e.height/this.backgroundHeight),s=this.backgroundWidth*a,h=this.backgroundHeight*a;else{var s=(i=i.split(" "))[0]||"",h=i[1]||s;t(s)?s=e.width*parseFloat(s)/100:"auto"!=s&&(s=parseFloat(s)),t(h)?h=e.height*parseFloat(h)/100:"auto"!=h&&(h=parseFloat(h)),"auto"==s&&"auto"==h?(s=this.backgroundWidth,h=this.backgroundHeight):("auto"==s&&(s=this.backgroundWidth*(h/this.backgroundHeight)),"auto"==h&&(h=this.backgroundHeight*(s/this.backgroundWidth)))}var c=n[0],d=n[1];c=t(c)?e.left+(e.width-s)*parseFloat(c)/100:e.left+parseFloat(c),d=t(d)?e.top+(e.height-h)*parseFloat(d)/100:e.top+parseFloat(d);var f=this.$el.offset();this.renderProgram.uniforms.topLeft=new Float32Array([(f.left-c)/s,(f.top-d)/h]),this.renderProgram.uniforms.bottomRight=new Float32Array([this.renderProgram.uniforms.topLeft[0]+this.$el.innerWidth()/s,this.renderProgram.uniforms.topLeft[1]+this.$el.innerHeight()/h]);var l=Math.max(this.canvas.width,this.canvas.height);this.renderProgram.uniforms.containerRatio=new Float32Array([this.canvas.width/l,this.canvas.height/l])},initShaders:function(){var e=["attribute vec2 vertex;","varying vec2 coord;","void main() {","coord = vertex * 0.5 + 0.5;","gl_Position = vec4(vertex, 0.0, 1.0);","}"].join("\n");this.dropProgram=i(e,["precision highp float;","const float PI = 3.141592653589793;","uniform sampler2D texture;","uniform vec2 center;","uniform float radius;","uniform float strength;","varying vec2 coord;","void main() {","vec4 info = texture2D(texture, coord);","float drop = max(0.0, 1.0 - length(center * 0.5 + 0.5 - coord) / radius);","drop = 0.5 - cos(drop * PI) * 0.5;","info.r += drop * strength;","gl_FragColor = info;","}"].join("\n")),this.updateProgram=i(e,["precision highp float;","uniform sampler2D texture;","uniform vec2 delta;","varying vec2 coord;","void main() {","vec4 info = texture2D(texture, coord);","vec2 dx = vec2(delta.x, 0.0);","vec2 dy = vec2(0.0, delta.y);","float average = (","texture2D(texture, coord - dx).r +","texture2D(texture, coord - dy).r +","texture2D(texture, coord + dx).r +","texture2D(texture, coord + dy).r",") * 0.25;","info.g += (average - info.r) * 2.0;","info.g *= 0.995;","info.r += info.g;","gl_FragColor = info;","}"].join("\n")),s.uniform2fv(this.updateProgram.locations.delta,this.textureDelta),this.renderProgram=i(["precision highp float;","attribute vec2 vertex;","uniform vec2 topLeft;","uniform vec2 bottomRight;","uniform vec2 containerRatio;","varying vec2 ripplesCoord;","varying vec2 backgroundCoord;","void main() {","backgroundCoord = mix(topLeft, bottomRight, vertex * 0.5 + 0.5);","backgroundCoord.y = 1.0 - backgroundCoord.y;","ripplesCoord = vec2(vertex.x, -vertex.y) * containerRatio * 0.5 + 0.5;","gl_Position = vec4(vertex.x, -vertex.y, 0.0, 1.0);","}"].join("\n"),["precision highp float;","uniform sampler2D samplerBackground;","uniform sampler2D samplerRipples;","uniform vec2 delta;","uniform float perturbance;","varying vec2 ripplesCoord;","varying vec2 backgroundCoord;","void main() {","float height = texture2D(samplerRipples, ripplesCoord).r;","float heightX = texture2D(samplerRipples, vec2(ripplesCoord.x + delta.x, ripplesCoord.y)).r;","float heightY = texture2D(samplerRipples, vec2(ripplesCoord.x, ripplesCoord.y + delta.y)).r;","vec3 dx = vec3(delta.x, heightX - height, 0.0);","vec3 dy = vec3(0.0, heightY - height, delta.y);","vec2 offset = -normalize(cross(dy, dx)).xz;","float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0);","gl_FragColor = texture2D(samplerBackground, backgroundCoord + offset * perturbance) + specular;","}"].join("\n")),s.uniform2fv(this.renderProgram.locations.delta,this.textureDelta)},initTexture:function(){this.backgroundTexture=s.createTexture(),s.bindTexture(s.TEXTURE_2D,this.backgroundTexture),s.pixelStorei(s.UNPACK_FLIP_Y_WEBGL,1),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.LINEAR),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.LINEAR)},setTransparentTexture:function(){s.bindTexture(s.TEXTURE_2D,this.backgroundTexture),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,c)},hideCssBackground:function(){var e=this.$el[0].style.backgroundImage;"none"!=e&&(this.originalInlineCss=e,this.originalCssBackgroundImage=this.$el.css("backgroundImage"),this.$el.css("backgroundImage","none"))},restoreCssBackground:function(){this.$el.css("backgroundImage",this.originalInlineCss||"")},dropAtPointer:function(e,t,r){var i=parseInt(this.$el.css("border-left-width"))||0,o=parseInt(this.$el.css("border-top-width"))||0;this.drop(e.pageX-this.$el.offset().left-i,e.pageY-this.$el.offset().top-o,t,r)},drop:function(e,t,r,i){s=this.context;var n=this.$el.innerWidth(),a=this.$el.innerHeight(),u=Math.max(n,a);r/=u;var h=new Float32Array([(2*e-n)/u,(a-2*t)/u]);s.viewport(0,0,this.resolution,this.resolution),s.bindFramebuffer(s.FRAMEBUFFER,this.framebuffers[this.bufferWriteIndex]),o(this.textures[this.bufferReadIndex]),s.useProgram(this.dropProgram.id),s.uniform2fv(this.dropProgram.locations.center,h),s.uniform1f(this.dropProgram.locations.radius,r),s.uniform1f(this.dropProgram.locations.strength,i),this.drawQuad(),this.swapBufferIndices()},updateSize:function(){var e=this.$el.innerWidth(),t=this.$el.innerHeight();e==this.canvas.width&&t==this.canvas.height||(this.canvas.width=e,this.canvas.height=t)},destroy:function(){this.$el.off(".ripples").removeClass("jquery-ripples").removeData("ripples"),this.$canvas.remove(),this.restoreCssBackground(),this.destroyed=!0},show:function(){this.visible=!0,this.$canvas.show(),this.hideCssBackground()},hide:function(){this.visible=!1,this.$canvas.hide(),this.restoreCssBackground()},pause:function(){this.running=!1},play:function(){this.running=!0},set:function(e,t){switch(e){case"dropRadius":case"perturbance":case"interactive":case"crossOrigin":this[e]=t;break;case"imageUrl":this.imageUrl=t,this.loadImage()}}};var f=e.fn.ripples;e.fn.ripples=function(t){if(!h)throw new Error("Your browser does not support WebGL, the OES_texture_float extension or rendering to floating point textures.");var r=arguments.length>1?Array.prototype.slice.call(arguments,1):void 0;return this.each(function(){var i=e(this),o=i.data("ripples"),n=e.extend({},d.DEFAULTS,i.data(),"object"==typeof t&&t);(o||"string"!=typeof t)&&(o?"string"==typeof t&&d.prototype[t].apply(o,r):i.data("ripples",o=new d(this,n)))})},e.fn.ripples.Constructor=d,e.fn.ripples.noConflict=function(){return e.fn.ripples=f,this}});
+
+        var meter = null;
+        var canvasContext = null;
+        var WIDTH=500;
+        var HEIGHT=50;
+        var rafID = null;
+
+        window.onload = function() {
+            $('body').ripples({
+                resolution: 512,
+                dropRadius: 20,
+                perturbance: 0.04,
+            });
+            var newCanvas = document.getElementById( "meter" )
+            canvasContext = newCanvas.getContext("2d");
+  //      }
+
+        function didntGetStream() {
+            //alert('Stream generation failed.');
+        }
 
 
-			// coloring page
+        function gotStream(stream) {
+            // kick off the visual updating
+            drawLoop();
+        }
+
+        function drawLoop( time ) {
+            // clear the background
+            canvasContext.clearRect(0,0,WIDTH,HEIGHT);
+
+            // check if we're currently clipping
+            if (meter.checkClipping())
+                canvasContext.fillStyle = "red";
+            else
+                canvasContext.fillStyle = "green";
+//
+//            // draw a bar based on the current volume
+//            canvasContext.fillRect(0, 0, meter.volume*WIDTH*1.4, HEIGHT);
+
+            // set up the next visual callback
+            rafID = window.requestAnimationFrame( drawLoop );
+        }
+        
+        // ================= 
+        
+  //      window.onload = function() {
+            var outlineCanvas = document.getElementById('myCanvas');
+            /* ZOOM FUNCTIONALITY USING HAMMER.JS */
+            // TODO: FIX ZOOM -> WHITE BORDER/CUTOFF
+            // TODO: FIX ZOOM LOCATION TO PINCH AREA / INCORPORATE PAN GESTURE?
+            var pinchHammer = new Hammer(document.getElementById('myCanvas'));
+            pinchHammer.get('pinch').set({ enable: true }); // disabled by default
+            pinchHammer.on('pinch', function(e) {
+                if (e.scale >= 1) {
+                    paper.view.zoom = e.scale;
+                }
+            });
+            
+            /* PAN FUCNTIONALITY USING HAMEMR.JS */
+           // Requires 2 fingers. Combined with zoom. 
+           var panHammer = new Hammer(document.getElementById('myCanvas'));
+           panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
+           panHammer.on('pan', function(e) {
+             if (e.scale > 1) {
+              $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
+             }
+           });
+            
+            // coloring page
 			var mandala = {
 				item: null,
 				lastClicked: null,
@@ -110,11 +173,8 @@
 				options: [],
 				$container: $('#color-palette')
 			}
-
-			// your rectangle gradient interaction goes in this function
-			// you may also add code outside of the function (e.g., global variables)
-			// http://paperjs.org/tutorials/interaction/mouse-tool-events/
-			function myGradientInteraction() {
+            
+            function myGradientInteraction() {
 				var tool = new paper.Tool();
 				var start;
 				var end;
@@ -145,63 +205,22 @@
 					};
 				}
 			}
-
-			// your custom interaction goes here!
-			function myCustomInteraction() {
+            
+            function myCustomInteraction() {
 				var tool = new paper.Tool();
-        var path;
-        tool.fixedDistance = 30;
-        
-        /* SOLID COLOR FILL */
+                var path;
+                tool.fixedDistance = 30;
+                
+                /* SOLID COLOR FILL */
 				tool.onMouseDown = function(event) {
-				    var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
+                    var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
 				    if (hit) {
 				        hit.item.fillColor = cp.history[cp.history.length - 1];
 				    }
-				}
-        
-        
-        /* MODIFY THIS SO THAT MARKER/PEN IS ONLY USED TO ADD TO/CREATE OWN OUTLINES */
-//         /* MARKER */
-/*        // http://paperjs.org/tutorials/interaction/working-with-mouse-vectors/#adding-brush-stroke-ends
-//         tool.onMouseDown = function(event) {
-//           var hitOptions = { fill: true, tolerance: 1 };
-//           var hitResult = mandala.item.hitTest(event.point, hitOptions);
-          
-//           // TODO: FIX/DELETE 
-//           if (hitResult) {
-//             path = hitResult.item;
-//           } else {
-//             path = new paper.Path();
-//           }
-          
-//           // TODO: add a new path inside hitResult.item.
-// //           if (hitResult) {
-// //             path = new paper.Path();
-// //             hitResult.addChild
-// //             path.add(hitResult.item.hitTest.point); 
-// //           }
-       
-//           // path.fillColor = { hue: Math.random() * 360, saturation: 1, brightness: 1 };
-//           path.fillColor = cp.history[cp.history.length - 1];
-//         }
-
-//         tool.onMouseDrag = function(event) {
-//           var step = event.delta / 2;
-//           step.angle += 90;
-//           var top = event.middlePoint + step;
-//           var bottom = event.middlePoint - step;
-//           path.add(top);
-//           path.insert(0, bottom);
-//         }
-
-//         tool.onMouseUp = function(event) {
-//           path.closed = true;
-//         } */
-    }
-
-/* ======= TODO: REDO PALETTE. Add separate CSS file and modify div in HTML body ======= */
-			// create a color palette with the given colors
+                }
+            }
+            
+            // create a color palette with the given colors
 			function createColorPalette(colors) {
 				// create a swatch for each color
 				for (var i = colors.length - 1; i >= 0; i--) {
@@ -213,8 +232,8 @@
 					cp.$container.append($swatch);
 				}
 			}
-
-			// loads a set of colors from a json to create a color palette
+            
+            // loads a set of colors from a json to create a color palette
 			function getColorsCreatePalette() {
 				cp.$container.html(" ");
 				$.getJSON('/static/coloring/vendors/material/material-colors.json', function(colors) {
@@ -225,9 +244,9 @@
 					createColorPalette(cp.options);
 				});
 			}
-
-			function init(custom) {
-				paper.setup(canvas);
+            
+            function init(custom) {
+				paper.setup(outlineCanvas);
 				getColorsCreatePalette();
 				paper.project.importSVG(mandala.filePath, function(item) {
 					mandala.item = item._children["design-freepik"];
@@ -239,7 +258,8 @@
 				    }
 				});
 			}
-			// To see your myGradientInteraction version visit http://<your url>:8000/coloring/?type=gradient
+            
+            // To see your myGradientInteraction version visit http://<your url>:8000/coloring/?type=gradient
 			// To see your myCustomInteraction version visit http://<your url>:8000/coloring/
 			var url = window.location.href;
 			if (url.indexOf("gradient") > -1) {
@@ -247,405 +267,177 @@
 			} else {
 				init(true);
 			}
-		
-    
-    // SOURCE: https://codepen.io/shshaw/pen/zPxMgd
-    $(document).ready(function() {
-        console.clear();
-        var twoPI = 2 * Math.PI; 
-        var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d');
-      canvas.id = "watercolor-canvas";
-      // ------------------------------------------------
-      // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getExtension
-      // ADD FOR RIPPLES 
-//        var gl = canvas.getContext("2d"); // tried webgl, webgl2, and experimental-webgl
-//       console.log(gl);
-//        if (gl) {
-//          gl.getExtension('OES_texture_float');
-//          gl.getExtension('OES_texture_float_linear');
-//          $('canvas').ripples({
-//           resolution: 128,
-//           dropRadius: 10, //px
-//           perturbance: 0.04,
-//           interactive: false
-//         });
-//        }
-       // ------------------------------------------------
-      
-        var width = canvas.width = window.innerWidth,
-            height = canvas.height = window.innerHeight;
-        window.addEventListener('resize',function(){
-          width = canvas.width = window.innerWidth;
-          height = canvas.height = window.innerHeight;
-        });
-        document.body.appendChild(canvas);
+            
+            /* ==================================== WATERCOLOR ==================================== */
+         //   $(document).ready(function() {
+                console.clear();
+                var twoPI = 2 * Math.PI; 
+                var watercolorCanvas = document.createElement('canvas'),
+                    ctx = watercolorCanvas.getContext('2d');
 
-        function randomWiggle(wiggle) {
-          return (Math.random() * wiggle) * (Math.random() < 0.5 ? -1 : 1)
-        }
-        var color = -25;
-        function randomColor() {
-          color = Math.floor((color % 360) + 25 + 15 * Math.random());
-          return cp.history[cp.history.length - 1]; // MODIFICATION
-          //return 'hsl(' + color + ', 50%, 55%)';
-        }
+                watercolorCanvas.id = "watercolor-canvas"; // ADDED
 
-        function WaterColor(options) {
-          if (!(this instanceof WaterColor)) { return new WaterColor(options); }
-          for (var key in options) {
-            if (options.hasOwnProperty(key)) { this[key] = options[key]; }
-          }
-          if (!this.fill) { this.fill = randomColor(); }
-          this.c = Math.floor( Math.random() * 2 );
-          this.render();
-        }
+                var width = watercolorCanvas.width = window.innerWidth,
+                    height = watercolorCanvas.height = window.innerHeight;
+                window.addEventListener('resize',function(){
+                  width = watercolorCanvas.width = window.innerWidth;
+                  height = watercolorCanvas.height = window.innerHeight;
+                });
+                document.body.appendChild(watercolorCanvas);
 
-        WaterColor.prototype = {
-          sides: 6,
-          x: 20,
-          y: 20,
-          ctx: false,
-          speed: 0.3,
-          maxPoints: 3000,
-          maxRender: 5,
-          scale: false,
-          buildPoints() {
-            var wiggle = this.size * 0.15,
-                rotation = 0,
-                x = -this.size, 
-                y = 0,
-                horizontal = Math.random() > 0.5,
-                start = [ x, y ];
-            this.points = [ start ];
-            for (; rotation < twoPI; rotation += this.speed) {
-              x += 
-                this.size 
-                * this.speed
-                * Math.sin(rotation)
-                * ( horizontal ? 1 : 0.7 )
-                + randomWiggle( wiggle ); // * Math.cos( (rotation/twoPI) * twoPI ) );
-              y += 
-                this.size
-                * this.speed
-                * Math.cos(rotation)
-                * ( horizontal ? 0.7 : 1 )
-                + randomWiggle( wiggle );// * Math.cos( (rotation/twoPI) * twoPI) );
-              this.points.push([ x, y ]);
-            }
-            this.points.push( start );
-            this.originalPoints = this.points;
-            return this.points;
-          },
-          expandPoints() {
-            if (!this.points) { return this.buildPoints(); }
-            if (this.points.length > this.maxPoints) { return false; }
-            var wiggle = this.size * 0.05;
-            var p = [],
-                i = 0,
-                len = this.points.length - 1,
-                x, y, x2, y2;
-            for ( ; i < len; i++) {
-              y = this.points[i][1];
-              x = this.points[i][0];
-              y2 = this.points[i + 1][1];
-              x2 = this.points[i + 1][0];
-              p.push(
-                [x, y],
-                [(( x2 + x )/2) + randomWiggle(wiggle),  
-                  (( y2 + y )/2) + randomWiggle(wiggle)],
-                [x2, y2]
-              );
-            }
-            this.points = p;
-            return true;
-          },
-          c: 0,
-          render: function(){
-            this.c++;
-            if ( this.c < (this.maxRender * 3) ) { requestAnimationFrame(this.render.bind(this)); }
-            if ( this.c % 3 == 0 ) { this.draw(this.c / 3); }
-          },
-          draw: function(c) {
-            if (this.ctx) {
-              while ( this.expandPoints() ){}
-              var ctx = this.ctx;
-              var itr = (c/this.maxRender);
-              ctx.setTransform(1, 0, 0, 1, 0, 0);
-              ctx.globalCompositeOperation = 'hard-light';// 'xor';
-              ctx.globalAlpha = 0.25 - ( itr * 0.1 );
-              ctx.translate( this.x, this.y );
-              if (this.scale) { ctx.scale( 1 + itr * 0.2, 1 + itr * 0.2 ); }
-              ctx.beginPath();
-              ctx.moveTo(this.points[0][0], this.points[0][1]); //this.x + this.size, this.y);
-              for (var i = 0, len = this.points.length; i < len; i++) {
-                ctx.lineTo( this.points[i][0], this.points[i][1] );
-              }
-              ctx.closePath();
-              ctx.fillStyle = this.fill;
-              ctx.fill();
-              this.points = this.originalPoints;
-            }
-            return this;
-          }
-        };
+                function randomWiggle(wiggle) {
+                  return (Math.random() * wiggle) * (Math.random() < 0.5 ? -1 : 1)
+                }
 
-        var color = 0;
-        function makeWatercolor(e){
-          var x = width * Math.random(),
-              y = height * Math.random();
-          if (e) {
-            e = e.touches ? e.touches[0] : e;
-            x = e.clientX || e.x;
-            y = e.clientY || e.y;
-          }
-          ctx.globalAlpha = 0.02;
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.fillStyle = '#FFF';
-          ctx.fillRect(0, 0, width, height);
-          new WaterColor({
-            ctx: ctx,
-            size: Math.min(width,height) * ( 0.2 + Math.random() * 0.1 ),
-            x: x,
-            y: y,
-            scale: true
-          })
-        }
-        document.addEventListener('click', makeWatercolor );
-        document.addEventListener('touchstart', makeWatercolor );
+                var color = -25;
 
-        var halfWidth = width / 2,
-            halfHeight = height / 2
-        for (var i = 0, len = 10; i < len; i++) {
-          new WaterColor({
-            ctx: ctx,
-            size: width * ( 0.7 + Math.random() * 0.1 ),
-            x: halfWidth + ( Math.cos( (i / len) * twoPI ) * halfWidth ), 
-            y: halfHeight + ( Math.sin( (i / len) * twoPI ) * halfHeight ) 
-          });
+                function randomColor() {
+                  color = Math.floor((color % 360) + 25 + 15 * Math.random());
+                  //return cp.history[cp.history.length - 1]; // MODIFICATION
+                  return 'hsl(' + color + ', 50%, 55%)';
+                }
+
+                function WaterColor(options) {
+                  if (!(this instanceof WaterColor)) { return new WaterColor(options); }
+                  for (var key in options) {
+                    if (options.hasOwnProperty(key)) { this[key] = options[key]; }
+                  }
+                  if (!this.fill) { this.fill = randomColor(); }
+                  this.c = Math.floor( Math.random() * 2 );
+                  this.render();
+                }
+
+                WaterColor.prototype = {
+                  sides: 6,
+                  x: 20,
+                  y: 20,
+                  ctx: false,
+                  speed: 0.3,
+                  maxPoints: 3000,
+                  maxRender: 5,
+                  scale: false,
+                  buildPoints() {
+                    var wiggle = this.size * 0.15,
+                        rotation = 0,
+                        x = -this.size, 
+                        y = 0,
+                        horizontal = Math.random() > 0.5,
+                        start = [ x, y ];
+                    this.points = [ start ];
+                    for (; rotation < twoPI; rotation += this.speed) {
+                      x += 
+                        this.size 
+                        * this.speed
+                        * Math.sin(rotation)
+                        * ( horizontal ? 1 : 0.7 )
+                        + randomWiggle( wiggle ); // * Math.cos( (rotation/twoPI) * twoPI ) );
+                      y += 
+                        this.size
+                        * this.speed
+                        * Math.cos(rotation)
+                        * ( horizontal ? 0.7 : 1 )
+                        + randomWiggle( wiggle );// * Math.cos( (rotation/twoPI) * twoPI) );
+                      this.points.push([ x, y ]);
+                    }
+                    this.points.push( start );
+                    this.originalPoints = this.points;
+                    return this.points;
+                  },
+                  expandPoints() {
+                    if (!this.points) { return this.buildPoints(); }
+                    if (this.points.length > this.maxPoints) { return false; }
+                    var wiggle = this.size * 0.05;
+                    var p = [],
+                        i = 0,
+                        len = this.points.length - 1,
+                        x, y, x2, y2;
+                    for ( ; i < len; i++) {
+                      y = this.points[i][1];
+                      x = this.points[i][0];
+                      y2 = this.points[i + 1][1];
+                      x2 = this.points[i + 1][0];
+                      p.push(
+                        [x, y],
+                        [(( x2 + x )/2) + randomWiggle(wiggle),  
+                          (( y2 + y )/2) + randomWiggle(wiggle)],
+                        [x2, y2]
+                      );
+                    }
+                    this.points = p;
+                    return true;
+                  },
+                  c: 0,
+                  render: function(){
+                    this.c++;
+                    if ( this.c < (this.maxRender * 3) ) { requestAnimationFrame(this.render.bind(this)); }
+                    if ( this.c % 3 == 0 ) { this.draw(this.c / 3); }
+                  },
+                  draw: function(c) {
+                    if (this.ctx) {
+                      while ( this.expandPoints() ){}
+                      var ctx = this.ctx;
+                      var itr = (c/this.maxRender);
+                      ctx.setTransform(1, 0, 0, 1, 0, 0);
+                      ctx.globalCompositeOperation = 'hard-light';// 'xor';
+                      ctx.globalAlpha = 0.25 - ( itr * 0.1 );
+                      ctx.translate( this.x, this.y );
+                      if (this.scale) { ctx.scale( 1 + itr * 0.2, 1 + itr * 0.2 ); }
+                      ctx.beginPath();
+                      ctx.moveTo(this.points[0][0], this.points[0][1]); //this.x + this.size, this.y);
+                      for (var i = 0, len = this.points.length; i < len; i++) {
+                        ctx.lineTo( this.points[i][0], this.points[i][1] );
+                      }
+                      ctx.closePath();
+                      ctx.fillStyle = this.fill;
+                      ctx.fill();
+                      this.points = this.originalPoints;
+                    }
+                    return this;
+                  }
+                };
+
+                var color = 0;
+                function makeWatercolor(e){
+                  var x = width * Math.random(),
+                      y = height * Math.random();
+                  if (e) {
+                    e = e.touches ? e.touches[0] : e;
+                    x = e.clientX || e.x;
+                    y = e.clientY || e.y;
+                  }
+                  ctx.globalAlpha = 0.02;
+                  ctx.setTransform(1, 0, 0, 1, 0, 0);
+                  ctx.fillStyle = '#FFF';
+                  ctx.fillRect(0, 0, width, height);
+                  new WaterColor({
+                    ctx: ctx,
+                    size: Math.min(width,height) * ( 0.2 + Math.random() * 0.1 ),
+                    x: x,
+                    y: y,
+                    scale: true
+                  })
+                }
+                document.addEventListener('click', makeWatercolor );
+                document.addEventListener('touchstart', makeWatercolor );
+
+                var halfWidth = width / 2,
+                    halfHeight = height / 2
+                for (var i = 0, len = 10; i < len; i++) {
+                  new WaterColor({
+                    ctx: ctx,
+                    size: width * ( 0.7 + Math.random() * 0.1 ),
+                    x: halfWidth + ( Math.cos( (i / len) * twoPI ) * halfWidth ), 
+                    y: halfHeight + ( Math.sin( (i / len) * twoPI ) * halfHeight ) 
+                  });
+                }
+       //     });
         }
-    });
-    // END CODEPEN CODE
-        
-    // RIPPLES
-    $('body').ripples({
-      resolution: 512,
-      dropRadius: 20,
-      perturbance: 0.04,
-    });
-    // END RIPPLES
-   }
-	</script>
+    </script>
 </head>
-  
-  
-<body style="background-image: none;" class="jquery-ripples">
-    <script type="text/javascript" src="{% static 'coloring/vendors/jquery.ripples.js' %}"></script> <!-- RIPPLES -->
-   <script type="text/javascript" src="{% static 'coloring/vendors/jquery.ripples-min.js' %}"></script> 
-  <script> 
-    $(document).ready(function() {
-      try {
-        $('body').ripples({
-          resolution: 512,
-          dropRadius: 20, //px
-          perturbance: 0.04,
-        });
-        $('main').ripples({
-          resolution: 128,
-          dropRadius: 10, //px
-          perturbance: 0.04,
-          interactive: false
-        });
-      }
-      catch (e) {
-        $('.error').show().text(e);
-      }
-
-      $('.js-ripples-disable').on('click', function() {
-        $('body, main').ripples('destroy');
-        $(this).hide();
-      });
-
-      $('.js-ripples-play').on('click', function() {
-        $('body, main').ripples('play');
-      });
-
-      $('.js-ripples-pause').on('click', function() {
-        $('body, main').ripples('pause');
-      });
-
-      // Automatic drops
-      setInterval(function() {
-        var $el = $('main');
-        var x = Math.random() * $el.outerWidth();
-        var y = Math.random() * $el.outerHeight();
-        var dropRadius = 20;
-        var strength = 0.04 + Math.random() * 0.04;
-
-        $el.ripples('drop', x, y, dropRadius, strength);
-      }, 400);
-    });
-  </script>
-  
-  <script>
-    /**
- * jQuery Ripples plugin v0.6.2 / https://github.com/sirxemic/jquery.ripples
- * MIT License
- * @author sirxemic / https://sirxemic.com/
- */
-$(document).ready(function() {
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("jquery")):"function"==typeof define&&define.amd?define(["jquery"],t):t(e.$)}(this,function(e){"use strict";function t(e){return"%"==e[e.length-1]}function r(e){var t=e.split(" ");if(1!==t.length)return t.map(function(t){switch(e){case"center":return"50%";case"top":case"left":return"0";case"right":case"bottom":return"100%";default:return t}});switch(e){case"center":return["50%","50%"];case"top":return["50%","0"];case"bottom":return["50%","100%"];case"left":return["0","50%"];case"right":return["100%","50%"];default:return[e,"50%"]}}function i(e,t,r){function i(e,t){var r=s.createShader(e);if(s.shaderSource(r,t),s.compileShader(r),!s.getShaderParameter(r,s.COMPILE_STATUS))throw new Error("compile error: "+s.getShaderInfoLog(r));return r}var o={};if(o.id=s.createProgram(),s.attachShader(o.id,i(s.VERTEX_SHADER,e)),s.attachShader(o.id,i(s.FRAGMENT_SHADER,t)),s.linkProgram(o.id),!s.getProgramParameter(o.id,s.LINK_STATUS))throw new Error("link error: "+s.getProgramInfoLog(o.id));o.uniforms={},o.locations={},s.useProgram(o.id),s.enableVertexAttribArray(0);for(var n,a,u=/uniform (\w+) (\w+)/g,h=e+t;null!=(n=u.exec(h));)a=n[2],o.locations[a]=s.getUniformLocation(o.id,a);return o}function o(e,t){s.activeTexture(s.TEXTURE0+(t||0)),s.bindTexture(s.TEXTURE_2D,e)}function n(e){var t=/url\(["']?([^"']*)["']?\)/.exec(e);return null==t?null:t[1]}function a(e){return e.match(/^data:/)}var s,u=(e=e&&"default"in e?e.default:e)(window),h=function(){function e(e,t,i){var o="OES_texture_"+e,n=o+"_linear",a=n in r,s=[o];return a&&s.push(n),{type:t,arrayType:i,linearSupport:a,extensions:s}}var t=document.createElement("canvas");if(!(s=t.getContext("webgl")||t.getContext("experimental-webgl")))return null;var r={};if(["OES_texture_float","OES_texture_half_float","OES_texture_float_linear","OES_texture_half_float_linear"].forEach(function(e){var t=s.getExtension(e);t&&(r[e]=t)}),!r.OES_texture_float)return null;var i=[];i.push(e("float",s.FLOAT,Float32Array)),r.OES_texture_half_float&&i.push(e("half_float",r.OES_texture_half_float.HALF_FLOAT_OES,null));var o=s.createTexture(),n=s.createFramebuffer();s.bindFramebuffer(s.FRAMEBUFFER,n),s.bindTexture(s.TEXTURE_2D,o),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE);for(var a=null,u=0;u<i.length;u++)if(s.texImage2D(s.TEXTURE_2D,0,s.RGBA,32,32,0,s.RGBA,i[u].type,null),s.framebufferTexture2D(s.FRAMEBUFFER,s.COLOR_ATTACHMENT0,s.TEXTURE_2D,o,0),s.checkFramebufferStatus(s.FRAMEBUFFER)===s.FRAMEBUFFER_COMPLETE){a=i[u];break}return a}(),c=function(e,t){try{return new ImageData(e,t)}catch(r){return document.createElement("canvas").getContext("2d").createImageData(e,t)}}(32,32);e("head").prepend("<style>.jquery-ripples { position: relative; z-index: 0; }</style>");var d=function(t,r){function i(){o.destroyed||(o.step(),requestAnimationFrame(i))}var o=this;this.$el=e(t),this.interactive=r.interactive,this.resolution=r.resolution,this.textureDelta=new Float32Array([1/this.resolution,1/this.resolution]),this.perturbance=r.perturbance,this.dropRadius=r.dropRadius,this.crossOrigin=r.crossOrigin,this.imageUrl=r.imageUrl;var n=document.createElement("canvas");n.width=this.$el.innerWidth(),n.height=this.$el.innerHeight(),this.canvas=n,this.$canvas=e(n),this.$canvas.css({position:"absolute",left:0,top:0,right:0,bottom:0,zIndex:-1}),this.$el.addClass("jquery-ripples").append(n),this.context=s=n.getContext("webgl")||n.getContext("experimental-webgl"),h.extensions.forEach(function(e){s.getExtension(e)}),e(window).on("resize",function(){o.updateSize()}),this.textures=[],this.framebuffers=[],this.bufferWriteIndex=0,this.bufferReadIndex=1;for(var a=h.arrayType,u=a?new a(this.resolution*this.resolution*4):null,c=0;c<2;c++){var d=s.createTexture(),f=s.createFramebuffer();s.bindFramebuffer(s.FRAMEBUFFER,f),s.bindTexture(s.TEXTURE_2D,d),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,h.linearSupport?s.LINEAR:s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,h.linearSupport?s.LINEAR:s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,this.resolution,this.resolution,0,s.RGBA,h.type,u),s.framebufferTexture2D(s.FRAMEBUFFER,s.COLOR_ATTACHMENT0,s.TEXTURE_2D,d,0),this.textures.push(d),this.framebuffers.push(f)}this.quad=s.createBuffer(),s.bindBuffer(s.ARRAY_BUFFER,this.quad),s.bufferData(s.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,1,1,-1,1]),s.STATIC_DRAW),this.initShaders(),this.initTexture(),this.setTransparentTexture(),this.loadImage(),s.clearColor(0,0,0,0),s.blendFunc(s.SRC_ALPHA,s.ONE_MINUS_SRC_ALPHA),this.visible=!0,this.running=!0,this.inited=!0,this.destroyed=!1,this.setupPointerEvents(),requestAnimationFrame(i)};d.DEFAULTS={imageUrl:null,resolution:256,dropRadius:20,perturbance:.03,interactive:!0,crossOrigin:""},d.prototype={setupPointerEvents:function(){function e(){return r.visible&&r.running&&r.interactive}function t(t,i){e()&&r.dropAtPointer(t,r.dropRadius*(i?1.5:1),i?.14:.01)}var r=this;this.$el.on("mousemove.ripples",function(e){t(e)}).on("touchmove.ripples, touchstart.ripples",function(e){for(var r=e.originalEvent.changedTouches,i=0;i<r.length;i++)t(r[i])}).on("mousedown.ripples",function(e){t(e,!0)})},loadImage:function(){var e=this;s=this.context;var t=this.imageUrl||n(this.originalCssBackgroundImage)||n(this.$el.css("backgroundImage"));if(t!=this.imageSource)if(this.imageSource=t,this.imageSource){var r=new Image;r.onload=function(){function t(e){return 0==(e&e-1)}s=e.context;var i=t(r.width)&&t(r.height)?s.REPEAT:s.CLAMP_TO_EDGE;s.bindTexture(s.TEXTURE_2D,e.backgroundTexture),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,i),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,i),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,r),e.backgroundWidth=r.width,e.backgroundHeight=r.height,e.hideCssBackground()},r.onerror=function(){s=e.context,e.setTransparentTexture()},r.crossOrigin=a(this.imageSource)?null:this.crossOrigin,r.src=this.imageSource}else this.setTransparentTexture()},step:function(){s=this.context,this.visible&&(this.computeTextureBoundaries(),this.running&&this.update(),this.render())},drawQuad:function(){s.bindBuffer(s.ARRAY_BUFFER,this.quad),s.vertexAttribPointer(0,2,s.FLOAT,!1,0,0),s.drawArrays(s.TRIANGLE_FAN,0,4)},render:function(){s.bindFramebuffer(s.FRAMEBUFFER,null),s.viewport(0,0,this.canvas.width,this.canvas.height),s.enable(s.BLEND),s.clear(s.COLOR_BUFFER_BIT|s.DEPTH_BUFFER_BIT),s.useProgram(this.renderProgram.id),o(this.backgroundTexture,0),o(this.textures[0],1),s.uniform1f(this.renderProgram.locations.perturbance,this.perturbance),s.uniform2fv(this.renderProgram.locations.topLeft,this.renderProgram.uniforms.topLeft),s.uniform2fv(this.renderProgram.locations.bottomRight,this.renderProgram.uniforms.bottomRight),s.uniform2fv(this.renderProgram.locations.containerRatio,this.renderProgram.uniforms.containerRatio),s.uniform1i(this.renderProgram.locations.samplerBackground,0),s.uniform1i(this.renderProgram.locations.samplerRipples,1),this.drawQuad(),s.disable(s.BLEND)},update:function(){s.viewport(0,0,this.resolution,this.resolution),s.bindFramebuffer(s.FRAMEBUFFER,this.framebuffers[this.bufferWriteIndex]),o(this.textures[this.bufferReadIndex]),s.useProgram(this.updateProgram.id),this.drawQuad(),this.swapBufferIndices()},swapBufferIndices:function(){this.bufferWriteIndex=1-this.bufferWriteIndex,this.bufferReadIndex=1-this.bufferReadIndex},computeTextureBoundaries:function(){var e,i=this.$el.css("background-size"),o=this.$el.css("background-attachment"),n=r(this.$el.css("background-position"));if("fixed"==o?((e={left:window.pageXOffset,top:window.pageYOffset}).width=u.width(),e.height=u.height()):((e=this.$el.offset()).width=this.$el.innerWidth(),e.height=this.$el.innerHeight()),"cover"==i)var a=Math.max(e.width/this.backgroundWidth,e.height/this.backgroundHeight),s=this.backgroundWidth*a,h=this.backgroundHeight*a;else if("contain"==i)var a=Math.min(e.width/this.backgroundWidth,e.height/this.backgroundHeight),s=this.backgroundWidth*a,h=this.backgroundHeight*a;else{var s=(i=i.split(" "))[0]||"",h=i[1]||s;t(s)?s=e.width*parseFloat(s)/100:"auto"!=s&&(s=parseFloat(s)),t(h)?h=e.height*parseFloat(h)/100:"auto"!=h&&(h=parseFloat(h)),"auto"==s&&"auto"==h?(s=this.backgroundWidth,h=this.backgroundHeight):("auto"==s&&(s=this.backgroundWidth*(h/this.backgroundHeight)),"auto"==h&&(h=this.backgroundHeight*(s/this.backgroundWidth)))}var c=n[0],d=n[1];c=t(c)?e.left+(e.width-s)*parseFloat(c)/100:e.left+parseFloat(c),d=t(d)?e.top+(e.height-h)*parseFloat(d)/100:e.top+parseFloat(d);var f=this.$el.offset();this.renderProgram.uniforms.topLeft=new Float32Array([(f.left-c)/s,(f.top-d)/h]),this.renderProgram.uniforms.bottomRight=new Float32Array([this.renderProgram.uniforms.topLeft[0]+this.$el.innerWidth()/s,this.renderProgram.uniforms.topLeft[1]+this.$el.innerHeight()/h]);var l=Math.max(this.canvas.width,this.canvas.height);this.renderProgram.uniforms.containerRatio=new Float32Array([this.canvas.width/l,this.canvas.height/l])},initShaders:function(){var e=["attribute vec2 vertex;","varying vec2 coord;","void main() {","coord = vertex * 0.5 + 0.5;","gl_Position = vec4(vertex, 0.0, 1.0);","}"].join("\n");this.dropProgram=i(e,["precision highp float;","const float PI = 3.141592653589793;","uniform sampler2D texture;","uniform vec2 center;","uniform float radius;","uniform float strength;","varying vec2 coord;","void main() {","vec4 info = texture2D(texture, coord);","float drop = max(0.0, 1.0 - length(center * 0.5 + 0.5 - coord) / radius);","drop = 0.5 - cos(drop * PI) * 0.5;","info.r += drop * strength;","gl_FragColor = info;","}"].join("\n")),this.updateProgram=i(e,["precision highp float;","uniform sampler2D texture;","uniform vec2 delta;","varying vec2 coord;","void main() {","vec4 info = texture2D(texture, coord);","vec2 dx = vec2(delta.x, 0.0);","vec2 dy = vec2(0.0, delta.y);","float average = (","texture2D(texture, coord - dx).r +","texture2D(texture, coord - dy).r +","texture2D(texture, coord + dx).r +","texture2D(texture, coord + dy).r",") * 0.25;","info.g += (average - info.r) * 2.0;","info.g *= 0.995;","info.r += info.g;","gl_FragColor = info;","}"].join("\n")),s.uniform2fv(this.updateProgram.locations.delta,this.textureDelta),this.renderProgram=i(["precision highp float;","attribute vec2 vertex;","uniform vec2 topLeft;","uniform vec2 bottomRight;","uniform vec2 containerRatio;","varying vec2 ripplesCoord;","varying vec2 backgroundCoord;","void main() {","backgroundCoord = mix(topLeft, bottomRight, vertex * 0.5 + 0.5);","backgroundCoord.y = 1.0 - backgroundCoord.y;","ripplesCoord = vec2(vertex.x, -vertex.y) * containerRatio * 0.5 + 0.5;","gl_Position = vec4(vertex.x, -vertex.y, 0.0, 1.0);","}"].join("\n"),["precision highp float;","uniform sampler2D samplerBackground;","uniform sampler2D samplerRipples;","uniform vec2 delta;","uniform float perturbance;","varying vec2 ripplesCoord;","varying vec2 backgroundCoord;","void main() {","float height = texture2D(samplerRipples, ripplesCoord).r;","float heightX = texture2D(samplerRipples, vec2(ripplesCoord.x + delta.x, ripplesCoord.y)).r;","float heightY = texture2D(samplerRipples, vec2(ripplesCoord.x, ripplesCoord.y + delta.y)).r;","vec3 dx = vec3(delta.x, heightX - height, 0.0);","vec3 dy = vec3(0.0, heightY - height, delta.y);","vec2 offset = -normalize(cross(dy, dx)).xz;","float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0);","gl_FragColor = texture2D(samplerBackground, backgroundCoord + offset * perturbance) + specular;","}"].join("\n")),s.uniform2fv(this.renderProgram.locations.delta,this.textureDelta)},initTexture:function(){this.backgroundTexture=s.createTexture(),s.bindTexture(s.TEXTURE_2D,this.backgroundTexture),s.pixelStorei(s.UNPACK_FLIP_Y_WEBGL,1),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.LINEAR),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.LINEAR)},setTransparentTexture:function(){s.bindTexture(s.TEXTURE_2D,this.backgroundTexture),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,c)},hideCssBackground:function(){var e=this.$el[0].style.backgroundImage;"none"!=e&&(this.originalInlineCss=e,this.originalCssBackgroundImage=this.$el.css("backgroundImage"),this.$el.css("backgroundImage","none"))},restoreCssBackground:function(){this.$el.css("backgroundImage",this.originalInlineCss||"")},dropAtPointer:function(e,t,r){var i=parseInt(this.$el.css("border-left-width"))||0,o=parseInt(this.$el.css("border-top-width"))||0;this.drop(e.pageX-this.$el.offset().left-i,e.pageY-this.$el.offset().top-o,t,r)},drop:function(e,t,r,i){s=this.context;var n=this.$el.innerWidth(),a=this.$el.innerHeight(),u=Math.max(n,a);r/=u;var h=new Float32Array([(2*e-n)/u,(a-2*t)/u]);s.viewport(0,0,this.resolution,this.resolution),s.bindFramebuffer(s.FRAMEBUFFER,this.framebuffers[this.bufferWriteIndex]),o(this.textures[this.bufferReadIndex]),s.useProgram(this.dropProgram.id),s.uniform2fv(this.dropProgram.locations.center,h),s.uniform1f(this.dropProgram.locations.radius,r),s.uniform1f(this.dropProgram.locations.strength,i),this.drawQuad(),this.swapBufferIndices()},updateSize:function(){var e=this.$el.innerWidth(),t=this.$el.innerHeight();e==this.canvas.width&&t==this.canvas.height||(this.canvas.width=e,this.canvas.height=t)},destroy:function(){this.$el.off(".ripples").removeClass("jquery-ripples").removeData("ripples"),this.$canvas.remove(),this.restoreCssBackground(),this.destroyed=!0},show:function(){this.visible=!0,this.$canvas.show(),this.hideCssBackground()},hide:function(){this.visible=!1,this.$canvas.hide(),this.restoreCssBackground()},pause:function(){this.running=!1},play:function(){this.running=!0},set:function(e,t){switch(e){case"dropRadius":case"perturbance":case"interactive":case"crossOrigin":this[e]=t;break;case"imageUrl":this.imageUrl=t,this.loadImage()}}};var f=e.fn.ripples;e.fn.ripples=function(t){if(!h)throw new Error("Your browser does not support WebGL, the OES_texture_float extension or rendering to floating point textures.");var r=arguments.length>1?Array.prototype.slice.call(arguments,1):void 0;return this.each(function(){var i=e(this),o=i.data("ripples"),n=e.extend({},d.DEFAULTS,i.data(),"object"==typeof t&&t);(o||"string"!=typeof t)&&(o?"string"==typeof t&&d.prototype[t].apply(o,r):i.data("ripples",o=new d(this,n)))})},e.fn.ripples.Constructor=d,e.fn.ripples.noConflict=function(){return e.fn.ripples=f,this}});
-
-function createAudioMeter(audioContext,clipLevel,averaging,clipLag) {
-	var processor = audioContext.createScriptProcessor(512);
-	processor.onaudioprocess = volumeAudioProcess;
-	processor.clipping = false;
-	processor.lastClip = 0;
-	processor.volume = 0;
-	processor.clipLevel = clipLevel || 0.98;
-	processor.averaging = averaging || 0.95;
-	processor.clipLag = clipLag || 750;
-
-	// this will have no effect, since we don't copy the input to the output,
-	// but works around a current Chrome bug.
-	processor.connect(audioContext.destination);
-
-	processor.checkClipping =
-		function(){
-			if (!this.clipping)
-				return false;
-			if ((this.lastClip + this.clipLag) < window.performance.now())
-				this.clipping = false;
-			return this.clipping;
-		};
-
-	processor.shutdown =
-		function(){
-			this.disconnect();
-			this.onaudioprocess = null;
-		};
-
-	return processor;
-}
-
-function volumeAudioProcess( event ) {
-	var buf = event.inputBuffer.getChannelData(0);
-    var bufLength = buf.length;
-	var sum = 0;
-    var x;
-
-	// Do a root-mean-square on the samples: sum up the squares...
-    for (var i=0; i<bufLength; i++) {
-    	x = buf[i];
-    	if (Math.abs(x)>=this.clipLevel) {
-    		this.clipping = true;
-    		this.lastClip = window.performance.now();
-    	}
-    	sum += x * x;
-    }
-
-    // ... then take the square root of the sum.
-    var rms =  Math.sqrt(sum / bufLength);
-
-    // Now smooth this out with the averaging factor applied
-    // to the previous sample - take the max here because we
-    // want "fast attack, slow release."
-    this.volume = Math.max(rms, this.volume*this.averaging);
-}
-
-var audioContext = null;
-var meter = null;
-var canvasContext = null;
-var WIDTH=750;
-var HEIGHT=750;
-var rafID = null;
-
-window.onload = function() {
-    $('body').ripples({
-	    resolution: 512,
-	    dropRadius: 20,
-	    perturbance: 0.04,
-    });
-  $('.watercolor-canvas').ripples({
-	    resolution: 512,
-	    dropRadius: 20,
-	    perturbance: 0.04,
-    });
- //   var rippleCanvas = document.getElementById( "watercolor-canvas" ); // MODIFICATION 
-  var rippleCanvas = document.createElement('canvas');
-  rippleCanvas.id = "ripple-canvas";
-	var canvasContext = rippleCanvas.getContext("2d");
-    // monkeypatch Web Audio
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContext(); // grab an audio context
-    try {     // Attempt to get audio input
-        // monkeypatch getUserMedia
-        navigator.getUserMedia = 
-        	navigator.getUserMedia ||
-        	navigator.webkitGetUserMedia ||
-        	navigator.mozGetUserMedia;
-
-        // ask for an audio input
-        navigator.getUserMedia(
-        {
-            "audio": {
-                "mandatory": {
-                    "googEchoCancellation": "false",
-                    "googAutoGainControl": "false",
-                    "googNoiseSuppression": "false",
-                    "googHighpassFilter": "false"
-                },
-                "optional": []
-            },
-        }, gotStream, didntGetStream);
-    } catch (e) {
-        alert('getUserMedia threw exception :' + e);
-    }
-}
-
-
-function didntGetStream() {
-    alert('Stream generation failed.');
-}
-
-var mediaStreamSource = null;
-
-function gotStream(stream) {
-    // Create an AudioNode from the stream.
-    mediaStreamSource = audioContext.createMediaStreamSource(stream);
-
-    // Create a new volume meter and connect it.
-    meter = createAudioMeter(audioContext);
-    mediaStreamSource.connect(meter);
-
-    // kick off the visual updating
-    drawLoop();
-}
-
-function drawLoop( time ) {
-    // clear the background
-    canvasContext.clearRect(0,0,WIDTH,HEIGHT);
-
-    // check if we're currently clipping
-    if (meter.checkClipping())
-        canvasContext.fillStyle = "red";
-    else
-        canvasContext.fillStyle = "green";
-
-    // draw a bar based on the current volume
-    canvasContext.fillRect(0, 0, meter.volume*WIDTH*1.4, HEIGHT);
-    
-    if(meter.volume > 0.2) {
-        $('body').ripples("drop", Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight), 20, 20)
-    }
-
-    // set up the next visual callback
-    rafID = window.requestAnimationFrame( drawLoop );
-  }
-});
-  </script>
-  
-  <canvas id="myCanvas" width="770px" height="770px" class="jquery-ripples"></canvas>
+<body>
+    <canvas id="meter" width="800" height="800">
+    </canvas>
+    <canvas id="myCanvas" width="800px" height="800px"></canvas>
 	<div id="color-palette"></div>
 </body>
 </html>
