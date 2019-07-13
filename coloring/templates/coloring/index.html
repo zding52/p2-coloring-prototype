@@ -20,6 +20,7 @@
 
         body {
             height: 100%;
+/*             background: linear-gradient(0deg, rgba(skyblue, .6), rgba(skyblue, .6)), url(https://sirxemic.github.io/jquery.ripples/img/bg2.jpg); */
             background-image: url(https://sirxemic.github.io/jquery.ripples/img/bg2.jpg);
             background-size: cover;
             margin: 0;
@@ -60,14 +61,8 @@
 /*            height: 70vh;*/
             position: absolute;
             height: 100%;
-            
             background-color: rgba(skyblue, .6);
-/*            z-index: 5000;*/
             opacity: .6;
-        }
-        
-        .fish {
-            z-index: 20;
         }
     </style>
     
@@ -114,9 +109,6 @@
                 canvasContext.fillStyle = "red";
             else
                 canvasContext.fillStyle = "green";
-//
-//            // draw a bar based on the current volume
-//            canvasContext.fillRect(0, 0, meter.volume*WIDTH*1.4, HEIGHT);
 
             // set up the next visual callback
             rafID = window.requestAnimationFrame( drawLoop );
@@ -257,7 +249,6 @@
             
             /* ==================================== WATERCOLOR ==================================== */
          //   $(document).ready(function() {
-                console.clear();
                 var twoPI = 2 * Math.PI; 
                 var watercolorCanvas = document.createElement('canvas'),
                     ctx = watercolorCanvas.getContext('2d');
@@ -407,6 +398,7 @@
                 document.addEventListener('click', makeWatercolor );
                 document.addEventListener('touchstart', makeWatercolor );
 
+                // CONTROLS INITIAL BACKGROUND OF WATERCOLOR
                 var halfWidth = width / 2,
                     halfHeight = height / 2
                 for (var i = 0, len = 10; i < len; i++) {
@@ -415,16 +407,18 @@
                     size: width * ( 0.7 + Math.random() * 0.1 ),
                     x: halfWidth + ( Math.cos( (i / len) * twoPI ) * halfWidth ), 
                     y: halfHeight + ( Math.sin( (i / len) * twoPI ) * halfHeight ) 
-                  });
+               //   });
+                  }).fill = 'hsl(209, 74%, 79%)'; // Chaneg default background to blue instead of random colors
                 }
+          
        //     });
         }
     </script>
 </head>
 <body>
-    <canvas id="meter" width="800" height="800">
+    <canvas id="meter" width="770px" height="770px">
     </canvas>
-    <canvas id="myCanvas" width="800px" height="800px"></canvas>
+    <canvas id="myCanvas" width="770px" height="770px"></canvas>
 	<div id="color-palette"></div>
 </body>
 </html>
