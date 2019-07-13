@@ -29,28 +29,28 @@
         
         #color-palette {
             z-index: 2;
-			width: 300px;
-			background-color: #f1f1f1;
-			display: flex;
-			flex-wrap: wrap;
-			position: absolute;
-			top: 0;
+            width: 15%;
+            background-color: transparent;
+            display: flex;
+            flex-wrap: wrap;
+            position: absolute;
+            top: 0;
 		}
 
 		.swatch {
-			width: 24px;
-			height: 24px;
-			-moz-border-radius: 12px;
+			width: 36px;
+			height: 36px;
+			-moz-border-radius: 18px;
 			-webkit-border-radius: 12px;
 			border-radius: 12px;
 			margin: 3px;
 		}
     
  		#myCanvas {
-            z-index: 99999;
+            z-index: 3;
             position: absolute;
             top: 50%;
-            left: 50%;
+            left: 57%; /* 15% width for palette */
             transform: translate(-50%, -50%);
             display: block;
             background-color: transparent;
@@ -218,7 +218,12 @@
 				$.getJSON('/static/coloring/vendors/material/material-colors.json', function(colors) {
 					var keys = Object.keys(colors);
 					for (var i = keys.length - 1; i >= 0; i--) {
-						cp.options.push(colors[keys[i]][500]);
+				//		cp.options.push(colors[keys[i]][500]);
+            
+            // ADDED
+            cp.options.push(colors[keys[i]][300]);
+            cp.options.push(colors[keys[i]][500]);
+            cp.options.push(colors[keys[i]][900]);
 					}
 					createColorPalette(cp.options);
 				});
@@ -253,7 +258,9 @@
                 var watercolorCanvas = document.createElement('canvas'),
                     ctx = watercolorCanvas.getContext('2d');
 
-                watercolorCanvas.id = "watercolor-canvas"; // ADDED
+                watercolorCanvas.id = "watercolor-canvas"; // ADDED     
+          watercolorCanvas.width = "1200px";
+          watercolorCanvas.height = "1200px";
 
                 var width = watercolorCanvas.width = window.innerWidth,
                     height = watercolorCanvas.height = window.innerHeight;
@@ -416,7 +423,7 @@
     </script>
 </head>
 <body>
-    <canvas id="meter" width="770px" height="770px">
+    <canvas id="meter" width="1200px" height="1200px">
     </canvas>
     <canvas id="myCanvas" width="770px" height="770px"></canvas>
 	<div id="color-palette"></div>
