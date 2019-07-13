@@ -129,15 +129,15 @@
                 }
             });
             
-            /* PAN FUCNTIONALITY USING HAMEMR.JS */
-           // Requires 2 fingers. Combined with zoom. 
-           var panHammer = new Hammer(document.getElementById('myCanvas'));
-           panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
-           panHammer.on('pan', function(e) {
-             if (e.scale > 1) {
-              $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
-             }
-           });
+//             /* PAN FUCNTIONALITY USING HAMEMR.JS */
+//            // Requires 2 fingers. Combined with zoom. 
+//            var panHammer = new Hammer(document.getElementById('myCanvas'));
+//            panHammer.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0, pointers: 2 });
+//            panHammer.on('pan', function(e) {
+//              if (e.scale > 1) {
+//               $('#myCanvas').css('transform', 'translate(' + e.deltaX + 'px,' + e.deltaY + 'px)');
+//              }
+//            });
             
             // coloring page
 			var mandala = {
