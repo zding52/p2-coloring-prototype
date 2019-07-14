@@ -220,7 +220,7 @@
 //           $swatch.addClass("swatch").css("background-color",cp.history[cp.history-1]);
 					$swatch.click(function() {
 						// add color to the color palette history
-              
+              cp.$container.append(this);//Make dynamic palette
 					  	cp.history.push($(this).css("background-color"));
               
 					});
@@ -229,6 +229,8 @@
 				}
        
 			}
+          
+          
             
             // loads a set of colors from a json to create a color palette
 			function getColorsCreatePalette() {
