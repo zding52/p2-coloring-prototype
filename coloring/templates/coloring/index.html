@@ -204,7 +204,7 @@
                 
                 /* SOLID COLOR FILL */
 				tool.onMouseDown = function(event) {
-           document.addEventListener('click',playAudio );
+//            document.addEventListener('click',playAudio );
                     var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
 				    if (hit) {
 				        hit.item.fillColor = cp.history[cp.history.length - 1];
@@ -427,8 +427,7 @@
                 var x = document.getElementById("myAudio"); 
 
                 function playAudio() { 
-                  x.play(); 
-                  
+                  x.play();
                 } 
 
 
