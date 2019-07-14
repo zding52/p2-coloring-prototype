@@ -48,6 +48,14 @@
 			border-radius: 12px;
 			margin: 3px;
 		}
+      #swatch2{
+        width: 48px;
+			height: 48px;
+			-moz-border-radius: 18px;
+			-webkit-border-radius: 12px;
+			border-radius: 12px;
+			margin: 3px;
+      }  
     
  		#myCanvas {
             z-index: 3;
@@ -124,13 +132,13 @@
             /* ZOOM FUNCTIONALITY USING HAMMER.JS */
             // TODO: FIX ZOOM -> WHITE BORDER/CUTOFF
             // TODO: FIX ZOOM LOCATION TO PINCH AREA / INCORPORATE PAN GESTURE?
-            var pinchHammer = new Hammer(document.getElementById('myCanvas'));
-            pinchHammer.get('pinch').set({ enable: true }); // disabled by default
-            pinchHammer.on('pinch', function(e) {
-                if (e.scale >= 1) {
-                    paper.view.zoom = e.scale;
-                }
-            });
+//             var pinchHammer = new Hammer(document.getElementById('myCanvas'));
+//             pinchHammer.get('pinch').set({ enable: true }); // disabled by default
+//             pinchHammer.on('pinch', function(e) {
+//                 if (e.scale >= 1) {
+//                     paper.view.zoom = e.scale;
+//                 }
+//             });
             
 //             /* PAN FUCNTIONALITY USING HAMEMR.JS */
 //            // Requires 2 fingers. Combined with zoom. 
@@ -155,6 +163,7 @@
 				options: [],
 				$container: $('#color-palette')
 			}
+      
             
             function myGradientInteraction() {
 				var tool = new paper.Tool();
@@ -195,6 +204,7 @@
                 
                 /* SOLID COLOR FILL */
 				tool.onMouseDown = function(event) {
+           document.addEventListener('click',playAudio );
                     var hit = mandala.item.hitTest(event.point, { tolerance: 10, fill: true });
 				    if (hit) {
 				        hit.item.fillColor = cp.history[cp.history.length - 1];
@@ -207,12 +217,17 @@
 				// create a swatch for each color
 				for (var i = colors.length - 1; i >= 0; i--) {
 					var $swatch = $("<div>").css("background-color", colors[i]).addClass("swatch");
+//           $swatch.addClass("swatch").css("background-color",cp.history[cp.history-1]);
 					$swatch.click(function() {
 						// add color to the color palette history
+              
 					  	cp.history.push($(this).css("background-color"));
+              
 					});
 					cp.$container.append($swatch);
+          
 				}
+       
 			}
             
             // loads a set of colors from a json to create a color palette
@@ -411,13 +426,13 @@
 
                 function playAudio() { 
                   x.play(); 
-                 
+                  
                 } 
 
 
                 document.addEventListener('click',playAudio );
                 document.addEventListener('touchstart', makeWatercolor );
-                
+          
           
                 
 
@@ -439,11 +454,12 @@
  
 </head>
 <body>
-  <audio id="myAudio"controls src="/static/coloring/music/Water-stream-sound.mp3" type="audio/mpeg" ></audio>
+  <audio id="myAudio"controls src="/static/coloring/music/20minWater.mp3" type="audio/mpeg" loop auto ></audio>
 <!--   <embed src="/static/coloring/music/Water-stream-sound.mp3" autostart="true" loop="true"  > -->
 <!--   <embed name="watersound" src="/coloring/Water-stream-sound.mp3" loop="true" hidden="true" autostart="true"> -->
 <!--   <span id="dummy"></span>   -->
   <canvas id="meter" width="1200px" height="1200px">
+    
     </canvas>
     <canvas id="myCanvas" width="770px" height="770px"></canvas>
 	<div id="color-palette"></div>
