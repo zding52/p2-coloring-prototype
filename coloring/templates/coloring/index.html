@@ -13,6 +13,9 @@
     <link rel="stylesheet" type="text/css" href="../../static/coloring/vendors/bootstrap/css/bootstrap.css" />
     
     <style type="text/css">
+        audio { 
+        display:none;
+        }
         body, 
         html {
             height: 100%;
@@ -402,8 +405,21 @@
                     scale: true
                   })
                 }
-                document.addEventListener('click', makeWatercolor );
+          //PLay audio
+
+                var x = document.getElementById("myAudio"); 
+
+                function playAudio() { 
+                  x.play(); 
+                 
+                } 
+
+
+                document.addEventListener('click',playAudio );
                 document.addEventListener('touchstart', makeWatercolor );
+                
+          
+                
 
                 // CONTROLS INITIAL BACKGROUND OF WATERCOLOR
                 var halfWidth = width / 2,
@@ -411,7 +427,6 @@
                 for (var i = 0, len = 10; i < len; i++) {
                   new WaterColor({
                     ctx: ctx,
-                    size: width * ( 0.7 + Math.random() * 0.1 ),
                     x: halfWidth + ( Math.cos( (i / len) * twoPI ) * halfWidth ), 
                     y: halfHeight + ( Math.sin( (i / len) * twoPI ) * halfHeight ) 
                //   });
@@ -421,11 +436,17 @@
        //     });
         }
     </script>
+ 
 </head>
 <body>
-    <canvas id="meter" width="1200px" height="1200px">
+  <audio id="myAudio"controls src="/static/coloring/music/Water-stream-sound.mp3" type="audio/mpeg" ></audio>
+<!--   <embed src="/static/coloring/music/Water-stream-sound.mp3" autostart="true" loop="true"  > -->
+<!--   <embed name="watersound" src="/coloring/Water-stream-sound.mp3" loop="true" hidden="true" autostart="true"> -->
+<!--   <span id="dummy"></span>   -->
+  <canvas id="meter" width="1200px" height="1200px">
     </canvas>
     <canvas id="myCanvas" width="770px" height="770px"></canvas>
 	<div id="color-palette"></div>
+  
 </body>
 </html>
